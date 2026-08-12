@@ -16,6 +16,8 @@ from storage import Database, Detection
 import os
 from dotenv import load_dotenv
 
+from alerts import AlertManager
+
 # Carrega .env
 load_dotenv()
 
@@ -45,6 +47,7 @@ class CameraGuardian:
     def __init__(self):
         self.camera = WebcamCapture(frame_interval=FRAME_INTERVAL)
         self.db = Database()
+        self.alerts = AlertManager()
         self.last_alert_time: Dict[str, float] = {}
         self.frame_count = 0
         self.detection_count = 0
@@ -156,7 +159,9 @@ class CameraGuardian:
 
                         # Alerta
                         if self.should_alert(class_name):
+                            msg = f"PEOPLE detectado com {confidence:.1%} de confiança"
                             print(f"🚨 ALERTA: {class_name.upper()} detectado ({confidence:.1%})")
+                            self.alerts.send(msg)
                         else:
                             print(f"📍 {class_name.upper()} detectado ({confidence:.1%}) - cooldown ativo")
 
