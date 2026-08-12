@@ -32,7 +32,7 @@ MODEL_VERSION = 2
 
 FRAME_INTERVAL = 1  # Segundos entre frames
 ALERT_COOLDOWN = 30  # Segundos entre alertas da mesma classe """
-TARGET_CLASSES = ["person"]  # Classes a monitorar
+TARGET_CLASSES = ["people"]  # Classes a monitorar
 
 # Valida configuração
 if not API_KEY or not PROJECT_ID:
@@ -69,12 +69,15 @@ class CameraGuardian:
 
             data = response.json()
             predictions = data.get("predictions", [])
+            #print(f"DEBUG: predictions = {len(predictions)}") 
+
 
             # Filtra por classe e confiança
             detections = []
             for pred in predictions:
                 class_name = pred.get("class", "unknown")
                 confidence = pred.get("confidence", 0)
+                #print(f"DEBUG: {class_name} = {confidence:.1%}")  
 
                 if class_name in TARGET_CLASSES and confidence > 0.5:
                     detections.append({
@@ -82,6 +85,7 @@ class CameraGuardian:
                         "confidence": confidence
                     })
 
+            #print(f"DEBUG: detections retornadas = {len(detections)}")  
             return detections
 
         except Exception as e:
