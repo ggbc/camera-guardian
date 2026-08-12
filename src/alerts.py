@@ -22,15 +22,15 @@ class AlertManager:
             print("⚠️ Email configurado mas credenciais incompletas")
             self.enabled = False
 
-    def send(self, message: str, subject: str = "🚨 Camera Guardian Alert") -> bool:
-        """Envia alerta por email."""
+    def send(self, message: str, image_bytes: bytes = None, subject: str = "🚨 Camera Guardian Alert") -> bool:
+        """Envia alerta por email com imagem opcional."""
         if not self.enabled:
             print(f"📧 [Email desativado] {message}")
             return True
 
         try:
             # Monta email
-            msg = MIMEMultipart("alternative")
+            msg = MIMEMultipart("related")
             msg["Subject"] = subject
             msg["From"] = self.smtp_user
             msg["To"] = self.email_to
@@ -38,22 +38,33 @@ class AlertManager:
             # Conteúdo HTML
             html = f"""
             <html>
-              <body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
+            <body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
                 <div style="background-color: white; padding: 20px; border-radius: 8px; border-left: 4px solid #ff6b6b;">
-                  <h2 style="color: #ff6b6b; margin-top: 0;">🚨 Camera Guardian Alert</h2>
-                  <p><strong>{message}</strong></p>
-                  <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                  <p style="font-size: 12px; color: #999;">
+                <h2 style="color: #ff6b6b; margin-top: 0;">🚨 Camera Guardian Alert</h2>
+                <p><strong>{message}</strong></p>
+                
+                {'<img src="cid:frame_image" style="max-width: 100%; height: auto; border-radius: 4px; margin-top: 20px;">' if image_bytes else ''}
+                
+                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                <p style="font-size: 12px; color: #999;">
                     <strong>Timestamp:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}<br>
                     <strong>Location:</strong> Your Webcam
-                  </p>
+                </p>
                 </div>
-              </body>
+            </body>
             </html>
             """
 
             part = MIMEText(html, "html")
             msg.attach(part)
+
+            # Adiciona imagem como attachment
+            if image_bytes:
+                from email.mime.image import MIMEImage
+                img = MIMEImage(image_bytes)
+                img.add_header("Content-ID", "<frame_image>")
+                img.add_header("Content-Disposition", "inline", filename="frame.jpg")
+                msg.attach(img)
 
             # Envia
             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:

@@ -161,7 +161,7 @@ class CameraGuardian:
                         if self.should_alert(class_name):
                             msg = f"PEOPLE detectado com {confidence:.1%} de confiança"
                             print(f"🚨 ALERTA: {class_name.upper()} detectado ({confidence:.1%})")
-                            self.alerts.send(msg)
+                            self.alerts.send(msg, image_bytes=frame_bytes) 
                         else:
                             print(f"📍 {class_name.upper()} detectado ({confidence:.1%}) - cooldown ativo")
 
