@@ -46,7 +46,7 @@ pip install -r requirements.txt
 
 2. **Create `.env` file:**
 ```bash
-   cp .env.example .env
+   touch .env
 ```
 
 3. **Edit `.env` with your credentials:**
@@ -55,6 +55,13 @@ ROBOFLOW_PROJECT_ID=your_project_id
 ROBOFLOW_MODEL_VERSION=2
 FRAME_INTERVAL=1
 ALERT_COOLDOWN=30
+
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+ALERT_EMAIL_TO=your_email@gmail.com
+ALERT_ENABLED=true
 
 ### Usage
 
